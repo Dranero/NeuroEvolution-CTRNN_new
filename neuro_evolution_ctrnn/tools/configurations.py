@@ -91,6 +91,13 @@ class EpisodeRunnerCfg(abc.ABC):
     use_autoencoder: bool = False
 
 
+@register('ELMAN')
+@attr.s(slots=True, auto_attribs=True, frozen=True)
+class ElmanCfg(IBrainCfg):
+    hidden_space: int
+    each_state_one_hidden: bool = False
+
+
 @register('CTRNN')
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class ContinuousTimeRNNCfg(IBrainCfg):

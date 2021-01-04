@@ -24,6 +24,8 @@ from processing_handlers.sequential_handler import SequentialHandler
 from tools.env_handler import EnvHandler
 from brains.CNN_CTRNN import CnnCtrnn
 
+from neuro_evolution_ctrnn.brains.elman import ElmanNetwork
+
 
 class Experiment(object):
 
@@ -46,6 +48,8 @@ class Experiment(object):
             self.brain_class = LSTMPyTorch
         elif self.config.brain.type == "LSTM_NumPy":
             self.brain_class = LSTMNumPy
+        elif self.config.brain.type == "ELMAN":
+            self.brain_class = ElmanNetwork
         elif self.config.brain.type == "ConcatenatedBrain_LSTM":
             self.brain_class = ConcatenatedLSTM
         elif self.config.brain.type == "CNN_CTRNN":
