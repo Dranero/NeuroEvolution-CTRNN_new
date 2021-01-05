@@ -21,6 +21,7 @@ def register(name: str, as_key: bool = False):
     :param as_key: if true, the node's key will be used for mapping. If false that type-value will be used
     :return: a wrapper of the class
     """
+
     # registering magic
     # See https://realpython.com/primer-on-python-decorators/#decorators-with-arguments
     def _register(type_class: type):
@@ -96,6 +97,12 @@ class EpisodeRunnerCfg(abc.ABC):
 class ElmanCfg(IBrainCfg):
     hidden_space: int
     each_state_one_hidden: bool = False
+
+
+@register('GRU')
+@attr.s(slots=True, auto_attribs=True, frozen=True)
+class GruCfg(IBrainCfg):
+    pass
 
 
 @register('CTRNN')

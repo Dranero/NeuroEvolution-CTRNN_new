@@ -220,7 +220,7 @@ class LSTMNumPy(LSTM):
 
         # The input for the i-th layer is the (i-1)-th hidden feature or if i==0 the input
         # Calculated as in the PyTorch description of the LSTM:
-        # https://pytorch.org/docs/stable/nn.html#torch.nn.LSTM
+        # https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html
         for i in range(self.lstm_num_layers):
 
             weight_ih_li = getattr(self, "weight_ih_l{}".format(i))
