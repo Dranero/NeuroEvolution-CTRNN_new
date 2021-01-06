@@ -9,11 +9,9 @@ class GruNetwork(IBrain[GruCfg]):
     def __init__(self, input_space: Space, output_space: Space, individual: np.ndarray, config: ConfigClass):
         super().__init__(input_space, output_space, individual, config)
 
-        self.config = config
-        self.input_space = input_space
-
         self.input_size = self._size_from_space(input_space)
         self.output_size = self._size_from_space(output_space)
+        # TODO is initialization with 0 good?
         self.hidden = [0 for _ in range(self.output_size)]
 
         # initialize weights out of individual
@@ -48,6 +46,7 @@ class GruNetwork(IBrain[GruCfg]):
 
     def step(self, ob: np.ndarray):
 
+        # TODO das könnte man in die IBrain Klasse verschieben, da ja auch die config option zu der Klasse gehört
         if self.config.normalize_input:
             ob = self._normalize_input(ob, self.input_space, self.config.normalize_input_target)
 
