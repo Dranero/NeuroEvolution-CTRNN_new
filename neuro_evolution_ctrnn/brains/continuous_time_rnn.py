@@ -98,11 +98,7 @@ class ContinuousTimeRNN(IBrain[ContinuousTimeRNNCfg]):
                 if self.W[j, j]:  # this if is a speedup when dealing with sparse matrices
                     self.W[j, j] = -abs(self.W[j, j])
 
-    def step(self, ob: np.ndarray) -> Union[np.ndarray, np.generic]:
-
-        if self.config.normalize_input:
-            ob = self._scale_observation(ob=ob, input_space=self.input_space, target=self.config.normalize_input_target)
-
+    def brainstep(self, ob: np.ndarray) -> Union[np.ndarray, np.generic]:
         if isinstance(self.input_space, Discrete):
             # todo: do this observation-transformation in a cleaner way
             ob = self.discrete_to_vector(ob)

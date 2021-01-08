@@ -16,8 +16,17 @@ class IBrain(abc.ABC, Generic[ConfigClass]):
         self.output_space = output_space
         self.config = config
 
-    @abc.abstractmethod
     def step(self, ob: np.ndarray):
+        self.brainstep(self.prepare_input(ob))
+
+    def prepare_input(self, ob: np.ndarray):
+        if self.config.normalize_input:
+            return self._normalize_input(ob, self.input_space, self.config.normalize_input_target)
+        else:
+            return ob
+
+    @abc.abstractmethod
+    def brainstep(self, ob: np.ndarray):
         pass
 
     @classmethod

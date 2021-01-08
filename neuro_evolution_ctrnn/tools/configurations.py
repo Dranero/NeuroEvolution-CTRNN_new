@@ -2,6 +2,7 @@
 import attr
 import abc
 from typing import Dict, List, Optional
+import array
 
 registered_types: Dict = {}
 registered_keys: Dict = {}
@@ -95,6 +96,7 @@ class EpisodeRunnerCfg(abc.ABC):
 @register('ELMAN')
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class ElmanCfg(IBrainCfg):
+    # number of hidden nodes
     hidden_space: int
     each_state_one_hidden: bool = False
 
@@ -102,7 +104,10 @@ class ElmanCfg(IBrainCfg):
 @register('GRU')
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class GruCfg(IBrainCfg):
-    pass
+    # List of the Gru layers.
+    # [5] is one layer with 5 gru nodes, [2,8] is first one layer with 2 nodes and then one layer with 8 nodes
+    hidden_structure: List[int]
+    each_state_one_hidden: bool = False
 
 
 @register('CTRNN')

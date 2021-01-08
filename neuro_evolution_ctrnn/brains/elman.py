@@ -1,8 +1,8 @@
 import numpy as np
 from gym import Space
 
-from neuro_evolution_ctrnn.brains.i_brain import IBrain, ConfigClass
-from neuro_evolution_ctrnn.tools.configurations import ElmanCfg
+from brains.i_brain import IBrain, ConfigClass
+from tools.configurations import ElmanCfg
 
 
 class ElmanNetwork(IBrain[ElmanCfg]):
@@ -23,17 +23,17 @@ class ElmanNetwork(IBrain[ElmanCfg]):
                                             in_size * hi_size + j * hi_size + hi_size
                                             ]] for j in range(out_size)]
         if self.config.each_state_one_hidden:
-            self.M_state_hidden = [[i] for i in individual[
+            self.M_state_hidden = np.diag(individual[
                                                 in_size * hi_size + hi_size * out_size:
                                                 in_size * hi_size + hi_size * out_size + hi_size:
-                                                ]]
+                                                ])
             individual_index = in_size * hi_size + hi_size * out_size + hi_size
         else:
             self.M_state_hidden = [[i for i in individual[
                                                in_size * hi_size + hi_size * out_size + j * hi_size:
                                                in_size * hi_size + hi_size * out_size + j * hi_size + hi_size
                                                ]] for j in range(config.hidden_space)]
-            individual_index = in_size * hi_size + hi_size * out_size + hi_size * hi_size + hi_size
+            individual_index = in_size * hi_size + hi_size * out_size + hi_size * hi_size
         if self.config.use_bias:
             self.bias = [i for i in individual[individual_index: individual_index + self.config.hidden_space]]
         else:
@@ -41,15 +41,14 @@ class ElmanNetwork(IBrain[ElmanCfg]):
 
         self.hidden = [0 for _ in range(self.config.hidden_space)]
 
-    def step(self, ob: np.ndarray):
+    def brainstep(self, ob: np.ndarray):
         # Annahme: ob sind Inputwerte
         assert len(ob) == self._size_from_space(self.input_space)
-        # TODO das könnte man in die IBrain Klasse verschieben, da ja auch die config option zu der Klasse gehört
-        if self.config.normalize_input:
-            ob = self._normalize_input(ob, self.input_space, self.config.normalize_input_target)
 
         self.state_layer = self.hidden = np.tanh(
-            np.dot(self.M_input_hidden, ob) + np.dot(self.M_state_hidden, self.state_layer) + self.bias)
+            np.dot(self.M_input_hidden, ob) +
+            np.dot(self.M_state_hidden, self.state_layer) +
+            self.bias)
 
         return np.dot(self.M_hidden_output, self.hidden)
 
@@ -66,6 +65,8 @@ class ElmanNetwork(IBrain[ElmanCfg]):
             individual_size += config.hidden_space
         else:
             individual_size += config.hidden_space * config.hidden_space
+        # bias
         if config.use_bias:
             individual_size += config.hidden_space
+
         return individual_size

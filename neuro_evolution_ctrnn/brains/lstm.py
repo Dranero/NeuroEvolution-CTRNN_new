@@ -19,7 +19,7 @@ class LSTM(IBrain):
         self.output_size = self._size_from_space(output_space)
         self.lstm_num_layers = config.lstm_num_layers
 
-    def step(self, ob: np.ndarray):
+    def brainstep(self, ob: np.ndarray):
         pass
 
     @classmethod
@@ -112,10 +112,7 @@ class LSTMPyTorch(nn.Module, LSTM):
                 torch.randn(self.lstm_num_layers, 1, self.output_size)
             )
 
-    def step(self, ob: np.ndarray):
-
-        if self.config.normalize_input:
-            ob = self._normalize_input(ob, self.input_space, self.config.normalize_input_target)
+    def brainstep(self, ob: np.ndarray):
 
         with torch.no_grad():
             # Input requires the form (seq_len, batch, input_size)
@@ -211,10 +208,7 @@ class LSTMNumPy(LSTM):
     def sigmoid(x):
         return 1 / (1 + np.exp(-x))
 
-    def step(self, ob: np.ndarray):
-
-        if self.config.normalize_input:
-            ob = self._normalize_input(ob, self.input_space, self.config.normalize_input_target)
+    def brainstep(self, ob: np.ndarray):
 
         x = ob.astype(np.float32)
 
