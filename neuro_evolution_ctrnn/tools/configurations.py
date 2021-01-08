@@ -1,7 +1,7 @@
 # the configurations need to be in a separate file from the actual objects to avoid circular imports
 import attr
 import abc
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Type
 import array
 
 registered_types: Dict = {}
@@ -43,6 +43,13 @@ class IBrainCfg(abc.ABC):
     normalize_input: bool
     normalize_input_target: float
     use_bias: bool
+
+
+@attr.s(slots=True, auto_attribs=True, frozen=True)
+class ILayerBasedBrainCfg(IBrainCfg):
+    # List of the Gru layers.
+    # [5] is one layer with 5 gru nodes, [2,8] is first one layer with 2 nodes and then one layer with 8 nodes
+    hidden_structure: List[int]
 
 
 @register('novelty', True)
@@ -98,16 +105,13 @@ class EpisodeRunnerCfg(abc.ABC):
 class ElmanCfg(IBrainCfg):
     # number of hidden nodes
     hidden_space: int
-    each_state_one_hidden: bool = False
+    each_state_one_hidden: bool = True
 
 
 @register('GRU')
 @attr.s(slots=True, auto_attribs=True, frozen=True)
-class GruCfg(IBrainCfg):
-    # List of the Gru layers.
-    # [5] is one layer with 5 gru nodes, [2,8] is first one layer with 2 nodes and then one layer with 8 nodes
-    hidden_structure: List[int]
-    each_state_one_hidden: bool = False
+class GruCfg(ILayerBasedBrainCfg):
+    each_state_one_hidden: bool = True
 
 
 @register('CTRNN')
