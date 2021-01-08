@@ -102,9 +102,7 @@ class EpisodeRunnerCfg(abc.ABC):
 
 @register('ELMAN')
 @attr.s(slots=True, auto_attribs=True, frozen=True)
-class ElmanCfg(IBrainCfg):
-    # number of hidden nodes
-    hidden_space: int
+class ElmanCfg(ILayerBasedBrainCfg):
     each_state_one_hidden: bool = True
 
 

@@ -136,11 +136,11 @@ class ILayerBasedBrain(IBrain, Generic[LayerdConfigClass]):
 
             # Reset Gate
             self.hidden[layer] = self.layer_step(x, self.weight_ih[layer], self.weight_hh[layer], self.bias_h[layer],
-                                                self.hidden[layer])
+                                                 self.hidden[layer])
 
         return np.dot(self.weight_ho, self.hidden[len(self.hidden) - 1])
 
     @staticmethod
     @abc.abstractmethod
-    def layer_step(layer_input: np.ndarray, wheight_ih, wheight_hh, bias_h, hidden):
+    def layer_step(layer_input: np.ndarray, weight_ih, weight_hh, bias_h, hidden):
         pass

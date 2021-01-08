@@ -18,7 +18,7 @@
   },
   "brain": {
     "type": "ELMAN",
-    "hidden_space": 10,
+    "hidden_structure": [4,4],
     "each_state_one_hidden": true,
     "use_bias": true,
     "normalize_input": false,
