@@ -48,7 +48,7 @@ class ILayerBasedBrain(IBrain, Generic[LayerdConfigClass]):
                 ind_index += number_gates * hidden_struc[layer - 1] * hidden_struc[layer]
 
             # Matrices for weighted hidden to gates
-            if config.each_state_one_hidden:
+            if config.diagonal_hidden_to_hidden:
                 self.weight_hh.append([np.diag(individual[
                                                ind_index + k * hidden_struc[layer] * hidden_struc[layer]:
                                                ind_index + k * hidden_struc[layer] * hidden_struc[layer] + hidden_struc[
@@ -114,7 +114,7 @@ class ILayerBasedBrain(IBrain, Generic[LayerdConfigClass]):
                 individual_size += number_gates * input_size * hidden_struc[0]
             else:
                 individual_size += number_gates * hidden_struc[layer] * hidden_struc[layer - 1]
-            if config.each_state_one_hidden:
+            if config.diagonal_hidden_to_hidden:
                 individual_size += number_gates * hidden_struc[layer]
             else:
                 individual_size += number_gates * hidden_struc[layer] * hidden_struc[layer]

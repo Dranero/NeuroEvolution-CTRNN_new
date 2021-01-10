@@ -51,6 +51,7 @@ class ILayerBasedBrainCfg(IBrainCfg):
     # [5] is one layer with 5 gru nodes, [2,8] is first one layer with 2 nodes and then one layer with 8 nodes
     hidden_structure: List[int]
     optimize_initial_hidden_values: bool
+    diagonal_hidden_to_hidden: bool = True
 
 
 @register('novelty', True)
@@ -104,13 +105,13 @@ class EpisodeRunnerCfg(abc.ABC):
 @register('ELMAN')
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class ElmanCfg(ILayerBasedBrainCfg):
-    each_state_one_hidden: bool = True
+    pass
 
 
 @register('GRU')
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class GruCfg(ILayerBasedBrainCfg):
-    each_state_one_hidden: bool = True
+    pass
 
 
 @register('CTRNN')

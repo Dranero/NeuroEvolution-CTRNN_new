@@ -107,10 +107,7 @@ class Weights:
             if visualizer.brain_config.use_bias:
                 # noinspection PyUnboundLocalVariable
                 weight_matrix = np.concatenate((weight_matrix, [bias]))
-        # TODO ich glabue dass die Matrix diagnal gespiegelt war, war ein großer Bug, der nicht aufgefallen ist,
-        ## weil weniger input als Neuronen da sind,
-        ## W quadratisch ist und die Methode für den Output verkehrt herum aufgerufen wurde
-        weight_matrix = np.rot90(np.fliplr(weight_matrix))
+
         for start_neuron, start_neuron_weights in enumerate(weight_matrix):
             Weights.check_zero_input(is_input, visualizer.draw_weight_mode, start_neuron, in_values)
 
@@ -128,6 +125,10 @@ class Weights:
     @staticmethod
     def draw_weights(visualizer: "brain_visualizer.BrainVisualizer", start_pos_dict: dict, end_pos_dict: dict,
                      weight_matrix, is_input: bool = False, in_values: np.ndarray = None) -> None:
+        # TODO ich glabue dass die Matrix diagnal gespiegelt war, war ein großer Bug, der nicht aufgefallen ist,
+        ## weil weniger input als Neuronen da sind,
+        ## W quadratisch ist und die Methode für den Output verkehrt herum aufgerufen wurde
+        weight_matrix = np.rot90(np.fliplr(weight_matrix))
         if visualizer.draw_weight_mode & Weights.WEIGHT_ALL:
             for (start_neuron, end_neuron), weight in np.ndenumerate(weight_matrix):
                 Weights.check_zero_input(is_input, visualizer.draw_weight_mode, start_neuron, in_values)

@@ -137,7 +137,7 @@ class ContinuousTimeRNN(IBrain[ContinuousTimeRNNCfg], IVisualizedBrain):
         else:
             self.y = np.clip(self.y, self.clipping_range_min, self.clipping_range_max)
 
-        o: Union[np.ndarray, np.generic] = np.tanh(self.T.T.dot(self.y))
+        o: Union[np.ndarray, np.generic] = np.tanh(self.T.dot(self.y))
         return o
 
     @classmethod
@@ -219,7 +219,7 @@ class ContinuousTimeRNN(IBrain[ContinuousTimeRNNCfg], IVisualizedBrain):
         return self.W.todense()
 
     def get_input_matrix(self):
-        return self.V.toarray().T
+        return self.V.toarray()
 
     def get_output_matrix(self):
         return self.T.toarray()

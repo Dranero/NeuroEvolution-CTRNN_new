@@ -100,7 +100,8 @@ class BrainVisualizer:
         self.clicked_neuron = None
 
         # Settings for drawing the weights
-        self.draw_weight_mode = Weights.WEIGHT_MAX
+        # TODO this should be in a config file
+        self.draw_weight_mode = Weights.WEIGHT_ALL
         # Threshold for drawing connections, 0 means it is disabled
         self.draw_threshold = 0.0
 
