@@ -7,9 +7,10 @@ import math
 from brains.i_brain import IBrain
 from scipy import sparse
 
+from brains.i_visualized_brain import IVisualizedBrain
 
-# noinspection PyPep8Naming
-class ContinuousTimeRNN(IBrain[ContinuousTimeRNNCfg]):
+
+class ContinuousTimeRNN(IBrain[ContinuousTimeRNNCfg], IVisualizedBrain):
     v_mask: np.ndarray
     w_mask: np.ndarray
     t_mask: np.ndarray
@@ -170,7 +171,8 @@ class ContinuousTimeRNN(IBrain[ContinuousTimeRNNCfg]):
 
         w_mask = cls._generate_mask(config.w_mask, config.number_neurons, config.number_neurons,
                                     config.w_mask_param)
-        t_mask = cls._generate_mask(config.t_mask, config.number_neurons, output_size, config.t_mask_param)
+        # TODO The mask was flipped on the diagonal for mathematical correct structure. check if no errer exist
+        t_mask = cls._generate_mask(config.t_mask, output_size, config.number_neurons, config.t_mask_param)
 
         cls.set_class_state(v_mask=v_mask, w_mask=w_mask, t_mask=t_mask)
 
@@ -209,3 +211,15 @@ class ContinuousTimeRNN(IBrain[ContinuousTimeRNNCfg]):
             return np.ones((n, m), dtype=bool)
         else:
             raise RuntimeError("unknown mask_type: " + str(mask_type))
+
+    def get_brain_nodes(self):
+        return self.y
+
+    def get_brain_edge_weights(self):
+        return self.W.todense()
+
+    def get_input_matrix(self):
+        return self.V.toarray().T
+
+    def get_output_matrix(self):
+        return self.T.toarray()

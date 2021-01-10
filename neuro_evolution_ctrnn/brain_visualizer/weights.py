@@ -107,13 +107,19 @@ class Weights:
             if visualizer.brain_config.use_bias:
                 # noinspection PyUnboundLocalVariable
                 weight_matrix = np.concatenate((weight_matrix, [bias]))
-
+        # TODO ich glabue dass die Matrix diagnal gespiegelt war, war ein großer Bug, der nicht aufgefallen ist,
+        ## weil weniger input als Neuronen da sind,
+        ## W quadratisch ist und die Methode für den Output verkehrt herum aufgerufen wurde
+        weight_matrix = np.rot90(np.fliplr(weight_matrix))
         for start_neuron, start_neuron_weights in enumerate(weight_matrix):
             Weights.check_zero_input(is_input, visualizer.draw_weight_mode, start_neuron, in_values)
 
             max_end_neuron = np.argmax(np.abs(start_neuron_weights))
             weight = start_neuron_weights[max_end_neuron]
-
+            # print(max_end_neuron)
+            # print(start_neuron_weights)
+            # print("----")
+            # print(end_pos_dict)
             start_pos = start_pos_dict[start_neuron]
             end_pos = end_pos_dict[max_end_neuron]
 
@@ -137,6 +143,7 @@ class Weights:
                     end_pos = end_pos_dict[end_neuron]
 
                     Weights.draw_connection(visualizer, start_pos, end_pos, weight)
+        # TODO wenn die Weights.WEIGHT_MAX usw. flags sind, warum ist dann hier elseif?
         elif visualizer.draw_weight_mode & Weights.WEIGHT_MAX:
             Weights.draw_maximum_weights(visualizer, start_pos_dict, end_pos_dict, weight_matrix, is_input, in_values)
         else:

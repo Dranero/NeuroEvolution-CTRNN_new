@@ -13,6 +13,7 @@ from brain_visualizer.events import Events
 from brain_visualizer.color import Colors
 from tools.configurations import IBrainCfg
 from brains.continuous_time_rnn import ContinuousTimeRNN
+from brains.i_visualized_brain import IVisualizedBrain
 
 
 class BrainVisualizerHandler:
@@ -21,7 +22,7 @@ class BrainVisualizerHandler:
 
     # color_clipping_range for colorClipping Input [0], Graph [1] and Output [2]
     def launch_new_visualization(self,
-                                 brain: ContinuousTimeRNN,
+                                 brain: IVisualizedBrain,
                                  brain_config: IBrainCfg,
                                  env_id: str,
                                  initial_observation: np.ndarray,
@@ -238,7 +239,7 @@ class BrainVisualizer:
             in_values = np.concatenate((in_values, [1]))
 
         number_input_neurons = in_values.size
-        number_neurons = len(self.brain.W.todense())
+        number_neurons = len(self.brain.get_brain_edge_weights())
         number_output_neurons = 1 if isinstance(out_values, np.int64) else len(out_values)
 
         # Draw Legend
@@ -254,16 +255,17 @@ class BrainVisualizer:
         # Draw Weights
         # This will draw the weights (i.e. the connections) between the input and the neurons
         if self.input_weights:
-            Weights.draw_weights(self, input_positions_dict, self.graph_positions_dict, self.brain.V.toarray().T,
+            Weights.draw_weights(self, input_positions_dict, self.graph_positions_dict, self.brain.get_input_matrix(),
                                  is_input=True, in_values=in_values)
 
         # Connections between the Neurons
-        Weights.draw_weights(self, self.graph_positions_dict, self.graph_positions_dict, self.brain.W.toarray(),
+        # TODO CTRNN was W.toarray(), not .todense(). check for error
+        Weights.draw_weights(self, self.graph_positions_dict, self.graph_positions_dict, self.brain.get_brain_edge_weights(),
                              is_input=False, in_values=None)
 
         # Connections between the Neurons and the Output
         if self.output_weights:
-            Weights.draw_weights(self, self.graph_positions_dict, output_positions_dict, self.brain.T.toarray(),
+            Weights.draw_weights(self, self.graph_positions_dict, output_positions_dict, self.brain.get_output_matrix(),
                                  is_input=False, in_values=None)
 
         # Draw neurons
@@ -272,7 +274,7 @@ class BrainVisualizer:
         # Radius is increased so that the circle is bigger than the neuron itself
         Neurons.draw_neurons(visualizer=self,
                              positions=self.graph_positions_dict,
-                             value_dict=self.brain.W.toarray(),
+                             value_dict=self.brain.get_brain_edge_weights(),
                              color_clipping_range=2,
                              negative_color=self.color_negative_weight,
                              neutral_color=self.color_neutral_weight,
@@ -285,7 +287,7 @@ class BrainVisualizer:
         # Draw graph
         Neurons.draw_neurons(visualizer=self,
                              positions=self.graph_positions_dict,
-                             value_dict=self.brain.y,
+                             value_dict=self.brain.get_brain_nodes(),
                              color_clipping_range=self.color_clipping_range[1],
                              negative_color=self.color_negative_neuron_graph,
                              neutral_color=self.color_neutral_neuron,

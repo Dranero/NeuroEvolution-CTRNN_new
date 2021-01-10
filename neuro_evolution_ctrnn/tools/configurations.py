@@ -50,6 +50,7 @@ class ILayerBasedBrainCfg(IBrainCfg):
     # List of the Gru layers.
     # [5] is one layer with 5 gru nodes, [2,8] is first one layer with 2 nodes and then one layer with 8 nodes
     hidden_structure: List[int]
+    optimize_initial_hidden_values: bool
 
 
 @register('novelty', True)
