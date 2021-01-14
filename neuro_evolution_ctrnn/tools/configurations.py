@@ -108,6 +108,12 @@ class ElmanCfg(ILayerBasedBrainCfg):
     pass
 
 
+@register('LSTMLayered')
+@attr.s(slots=True, auto_attribs=True, frozen=True)
+class LstmLayeredCfg(ILayerBasedBrainCfg):
+    pass
+
+
 @register('GRU')
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class GruCfg(ILayerBasedBrainCfg):

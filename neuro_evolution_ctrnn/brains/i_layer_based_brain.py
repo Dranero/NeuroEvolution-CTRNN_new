@@ -5,8 +5,6 @@ import numpy as np
 from tools.configurations import ILayerBasedBrainCfg
 from typing import List, TypeVar, Generic
 
-from brains.i_visualized_brain import IVisualizedBrain
-
 LayerdConfigClass = TypeVar('LayerdConfigClass', bound=ILayerBasedBrainCfg)
 
 
@@ -24,7 +22,8 @@ class ILayerBasedBrain(IBrain, Generic[LayerdConfigClass]):
         self.weight_ih = []
         self.weight_hh = []
         self.bias_h = []
-        self.hidden: List[List[int]] = []
+        self.hidden: List[List[float]] = []
+        self.layer_output: List[List[float]] = []
         number_gates = self.get_number_gates()
 
         for layer in range(len(hidden_struc)):
@@ -84,13 +83,14 @@ class ILayerBasedBrain(IBrain, Generic[LayerdConfigClass]):
                 ind_index += hidden_struc[layer]
             else:
                 self.hidden.append([0 for _ in range(hidden_struc[layer])])
+            self.layer_output.append([0 for _ in range(hidden_struc[layer])])
         # for end
 
         # Matrix for weighted hidden to output
         self.weight_ho = [[i for i in individual[
-                                       ind_index + j * hidden_struc[len(hidden_struc) - 1]:
-                                       ind_index + (j + 1) * hidden_struc[len(hidden_struc) - 1]
-                                       ]] for j in range(output_size)]
+                                      ind_index + j * hidden_struc[len(hidden_struc) - 1]:
+                                      ind_index + (j + 1) * hidden_struc[len(hidden_struc) - 1]
+                                      ]] for j in range(output_size)]
         ind_index += hidden_struc[len(hidden_struc) - 1] * output_size
 
     @staticmethod
@@ -136,22 +136,21 @@ class ILayerBasedBrain(IBrain, Generic[LayerdConfigClass]):
 
         layer_input = ob
 
-        # The input for the i-th layer is the (i-1)-th hidden feature or if i==0 the input
-        # Calculated as in the PyTorch description of the LSTM:
-        # https://pytorch.org/docs/stable/generated/torch.nn.GRU.html
-
         for layer in range(len(self.hidden)):
             if layer == 0:
                 x = layer_input
             else:
-                x = self.hidden[layer - 1]
+                x = self.layer_output[layer - 1]
 
-            self.hidden[layer] = self.layer_step(x, self.weight_ih[layer], self.weight_hh[layer], self.bias_h[layer],
-                                                 self.hidden[layer])
-        return np.dot(self.weight_ho, self.hidden[len(self.hidden) - 1])
+            layer_result = self.layer_step(x, self.weight_ih[layer], self.weight_hh[layer], self.bias_h[layer],
+                                           self.hidden[layer])
+            self.hidden[layer] = layer_result[0]
+            self.layer_output[layer] = layer_result[1]
+        return np.dot(self.weight_ho, self.layer_output[len(self.layer_output) - 1])
 
+    # Returns a list with two elements.
+    # The first element is the calculated new hidden cell state, the second is the layer output
     @staticmethod
     @abc.abstractmethod
     def layer_step(layer_input: np.ndarray, weight_ih, weight_hh, bias_h, hidden):
         pass
-

@@ -11,9 +11,10 @@ from brain_visualizer.weights import Weights
 from brain_visualizer.neurons import Neurons
 from brain_visualizer.events import Events
 from brain_visualizer.color import Colors
+from brains.i_brain import IBrain
 from tools.configurations import IBrainCfg
 from brains.continuous_time_rnn import ContinuousTimeRNN
-from brains.i_visualized_brain import IVisualizedBrain
+
 
 
 class BrainVisualizerHandler:
@@ -22,7 +23,7 @@ class BrainVisualizerHandler:
 
     # color_clipping_range for colorClipping Input [0], Graph [1] and Output [2]
     def launch_new_visualization(self,
-                                 brain: IVisualizedBrain,
+                                 brain: IBrain,
                                  brain_config: IBrainCfg,
                                  env_id: str,
                                  initial_observation: np.ndarray,

@@ -7,10 +7,8 @@ import math
 from brains.i_brain import IBrain
 from scipy import sparse
 
-from brains.i_visualized_brain import IVisualizedBrain
 
-
-class ContinuousTimeRNN(IBrain[ContinuousTimeRNNCfg], IVisualizedBrain):
+class ContinuousTimeRNN(IBrain[ContinuousTimeRNNCfg]):
     v_mask: np.ndarray
     w_mask: np.ndarray
     t_mask: np.ndarray

@@ -4,7 +4,8 @@ import torch
 import torch.nn as nn
 
 from brains.i_brain import IBrain
-from tools.configurations import LSTMCfg
+from brains.i_layer_based_brain import ILayerBasedBrain, LayerdConfigClass
+from tools.configurations import LSTMCfg, LstmLayeredCfg
 
 
 class LSTM(IBrain):
@@ -46,6 +47,10 @@ class LSTM(IBrain):
                 individual_size += 8 * output_size
 
         return individual_size
+
+    @staticmethod
+    def sigmoid(x):
+        return 1 / (1 + np.exp(-x))
 
 
 class LSTMPyTorch(nn.Module, LSTM):
@@ -216,7 +221,6 @@ class LSTMNumPy(LSTM):
         # Calculated as in the PyTorch description of the LSTM:
         # https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html
         for i in range(self.lstm_num_layers):
-
             weight_ih_li = getattr(self, "weight_ih_l{}".format(i))
             weight_hh_li = getattr(self, "weight_hh_l{}".format(i))
 
@@ -254,3 +258,49 @@ class LSTMNumPy(LSTM):
             x = self.hidden[i]
 
         return np.copy(self.hidden[-1])
+
+    class LSTMLayered(ILayerBasedBrain[LstmLayeredCfg]):
+        def __init__(self, input_space: Space, output_space: Space, individual: np.ndarray, config: LayerdConfigClass):
+            super().__init__(input_space, output_space, individual, config)
+
+        @staticmethod
+        def get_number_gates():
+            return 4
+
+        @staticmethod
+        def layer_step(layer_input: np.ndarray, weight_ih, weight_hh, bias_h, hidden):
+            # Input Gate
+            i_t = LSTM.sigmoid(np.dot(weight_ih[0], layer_input)
+                               + bias_h[0]
+                               + np.dot(weight_hh[0], hidden))
+
+            # Forget Gate
+            f_t = LSTM.sigmoid(np.dot(weight_ih[1], layer_input)
+                               + bias_h[1]
+                               + np.dot(weight_hh[1], hidden))
+
+            # Cell Gate
+            g_t = np.tanh(np.dot(weight_ih[2], layer_input)
+                          + bias_h[2]
+                          + np.dot(weight_hh[2], hidden))
+
+            # Output Gate
+            o_t = LSTM.sigmoid(np.dot(weight_ih[3], layer_input)
+                               + bias_h[3]
+                               + np.dot(weight_hh[3], hidden))
+
+            cell_state = np.multiply(f_t, hidden) + np.multiply(i_t, g_t)
+            output = np.multiply(o_t, np.tanh(cell_state))
+            return [cell_state, output]
+
+        def get_brain_nodes(self):
+            raise NotImplementedError
+
+        def get_brain_edge_weights(self):
+            raise NotImplementedError
+
+        def get_input_matrix(self):
+            raise NotImplementedError
+
+        def get_output_matrix(self):
+            raise NotImplementedError

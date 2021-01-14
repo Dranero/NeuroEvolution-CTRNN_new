@@ -104,3 +104,19 @@ class IBrain(abc.ABC, Generic[ConfigClass]):
         ob_new = np.zeros(self.input_space.n)
         ob_new[ob] = 1
         return ob_new
+
+    @abc.abstractmethod
+    def get_brain_nodes(self):
+        pass
+
+    @abc.abstractmethod
+    def get_brain_edge_weights(self):
+        pass
+
+    @abc.abstractmethod
+    def get_input_matrix(self):
+        pass
+
+    @abc.abstractmethod
+    def get_output_matrix(self):
+        pass

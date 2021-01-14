@@ -1,14 +1,11 @@
 import numpy as np
 from gym import Space
-from brains.i_brain import IBrain, ConfigClass
+from brains.i_brain import ConfigClass
 from tools.configurations import ElmanCfg
 from brains.i_layer_based_brain import ILayerBasedBrain
 
-from brains.i_visualized_brain import IVisualizedBrain
-from typing import List
 
-
-class ElmanNetwork(ILayerBasedBrain[ElmanCfg], IVisualizedBrain):
+class ElmanNetwork(ILayerBasedBrain[ElmanCfg]):
 
     @staticmethod
     def get_number_gates():
@@ -16,10 +13,11 @@ class ElmanNetwork(ILayerBasedBrain[ElmanCfg], IVisualizedBrain):
 
     @staticmethod
     def layer_step(layer_input: np.ndarray, weight_ih, weight_hh, bias_h, hidden):
-        return np.tanh(
+        result = np.tanh(
             np.dot(weight_ih[0], layer_input) +
             np.dot(weight_hh[0], hidden) +
             bias_h[0])
+        return [result, result]
 
     def __init__(self, input_space: Space, output_space: Space, individual: np.ndarray, config: ConfigClass):
         super().__init__(input_space, output_space, individual, config)
@@ -28,7 +26,7 @@ class ElmanNetwork(ILayerBasedBrain[ElmanCfg], IVisualizedBrain):
         return np.array([item for sublist in self.hidden for item in sublist])
 
     def get_brain_edge_weights(self):
-        result = self.weight_hh[0][0]
+        result: np.array = self.weight_hh[0][0]
         for i in range(1, len(self.hidden)):
             result = self.append_matrix_horizontally(result, self.append_matrix_vertically(
                 np.zeros((len(self.weight_ih[i][0]), len(result[0]) - len(self.weight_ih[i][0][0]))).tolist(),

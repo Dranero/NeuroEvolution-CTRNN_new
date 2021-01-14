@@ -17,20 +17,21 @@ class GruNetwork(ILayerBasedBrain[GruCfg]):
     def layer_step(layer_input, weight_ih, weight_hh, bias_h, hidden):
         # Reset Gate
         r_t = GruNetwork.sigmoid(np.dot(weight_ih[0], layer_input)
-                           + np.dot(weight_hh[0], hidden)
-                           + bias_h[0])
+                                 + np.dot(weight_hh[0], hidden)
+                                 + bias_h[0])
 
         # Update Gate
         z_t = GruNetwork.sigmoid(np.dot(weight_ih[1], layer_input)
-                           + np.dot(weight_hh[1], hidden)
-                           + bias_h[1])
+                                 + np.dot(weight_hh[1], hidden)
+                                 + bias_h[1])
 
         # New Gate
         n_t = np.tanh(np.dot(weight_ih[2], layer_input)
-                      + np.dot(r_t, np.dot(weight_hh[2], hidden)
-                               + bias_h[2]))
+                      + np.dot(r_t, np.dot(weight_hh[2], hidden))
+                      + bias_h[2])
 
-        return np.multiply(1 - z_t, n_t) + np.multiply(z_t, hidden)
+        result = np.multiply(1 - z_t, n_t) + np.multiply(z_t, hidden)
+        return [result, result]
 
     @staticmethod
     def get_number_gates():
