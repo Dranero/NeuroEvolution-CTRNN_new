@@ -22,28 +22,23 @@ class ILayerBasedBrain(IBrain, Generic[LayerdConfigClass]):
         self.weight_ih = []
         self.weight_hh = []
         self.bias_h = []
-        self.hidden: List[List[float]] = []
-        self.layer_output: List[List[float]] = []
+        self.hidden = []
+        self.layer_output = []
         number_gates = self.get_number_gates()
 
         for layer in range(len(hidden_struc)):
             # Matrices for weighted input to gates all layers
+
             if layer == 0:
-                self.weight_ih.append([[[i for i in individual[
-                                                    ind_index + k * input_size * hidden_struc[0]
-                                                    + j * input_size:
-                                                    ind_index + k * input_size * hidden_struc[0]
-                                                    + (j + 1) * input_size
-                                                    ]] for j in range(hidden_struc[0])] for k in range(number_gates)])
+                self.weight_ih.append(
+                    np.array(individual[ind_index:ind_index + number_gates * hidden_struc[layer] * input_size])
+                        .reshape((number_gates, hidden_struc[layer], input_size))
+                )
                 ind_index += number_gates * input_size * hidden_struc[0]
             else:
-                self.weight_ih.append([[[i for i in individual[
-                                                    ind_index + k * hidden_struc[layer - 1] * hidden_struc[layer]
-                                                    + j * hidden_struc[layer - 1]:
-                                                    ind_index + k * hidden_struc[layer - 1] * hidden_struc[layer]
-                                                    + (j + 1) * hidden_struc[layer - 1]
-                                                    ]] for j in range(hidden_struc[layer])] for k in
-                                       range(number_gates)])
+                self.weight_ih.append(np.full(
+                    (number_gates, hidden_struc[layer], hidden_struc[layer - 1]),
+                    individual[ind_index:ind_index + number_gates * hidden_struc[layer] * hidden_struc[layer - 1]]))
                 ind_index += number_gates * hidden_struc[layer - 1] * hidden_struc[layer]
 
             # Matrices for weighted hidden to gates
@@ -55,43 +50,38 @@ class ILayerBasedBrain(IBrain, Generic[LayerdConfigClass]):
                                        for k in range(number_gates)])
                 ind_index += number_gates * hidden_struc[layer]
             else:
-                self.weight_hh.append([[[i for i in individual[
-                                                    ind_index + k * hidden_struc[layer] * hidden_struc[layer]
-                                                    + j * hidden_struc[layer]:
-                                                    ind_index + k * hidden_struc[layer] * hidden_struc[layer]
-                                                    + (j + 1) * hidden_struc[layer]
-                                                    ]] for j in range(hidden_struc[layer])] for k in
-                                       range(number_gates)])
+                self.weight_hh.append(np.full(
+                    (number_gates, hidden_struc[layer], hidden_struc[layer]),
+                    individual[ind_index:ind_index + number_gates * hidden_struc[layer] * hidden_struc[layer]]))
                 ind_index += number_gates * hidden_struc[layer] * hidden_struc[layer]
 
             # initialize biases out of individual
             # Biases for gates
             if config.use_bias:
-                self.bias_h.append([[i for i in individual[
-                                                ind_index + j * hidden_struc[layer]:
-                                                ind_index + (j + 1) * hidden_struc[layer]
-                                                ]] for j in range(number_gates)])
+                self.bias_h.append(np.full(
+                    (number_gates, hidden_struc[layer]),
+                    individual[ind_index: ind_index + hidden_struc[layer] * number_gates]))
                 ind_index += hidden_struc[layer] * number_gates
             else:
                 self.bias_h.append(np.zeros((number_gates, hidden_struc[layer])).astype(np.float32))
             # initialize hidden
             if config.optimize_initial_hidden_values:
-                self.hidden.append([i for i in individual[
-                                               ind_index:
-                                               ind_index + hidden_struc[layer]
-                                               ]])
+                self.hidden.append(
+                    np.full((hidden_struc[layer]), individual[ind_index:ind_index + hidden_struc[layer]]))
                 ind_index += hidden_struc[layer]
             else:
-                self.hidden.append([0 for _ in range(hidden_struc[layer])])
-            self.layer_output.append([0 for _ in range(hidden_struc[layer])])
+                self.hidden.append(np.zeros((hidden_struc[layer])))
+            self.layer_output.append(np.zeros((hidden_struc[layer])))
         # for end
 
         # Matrix for weighted hidden to output
-        self.weight_ho = [[i for i in individual[
-                                      ind_index + j * hidden_struc[len(hidden_struc) - 1]:
-                                      ind_index + (j + 1) * hidden_struc[len(hidden_struc) - 1]
-                                      ]] for j in range(output_size)]
+        self.weight_ho = np.array(
+            individual[ind_index:ind_index + hidden_struc[len(hidden_struc) - 1] * output_size]).reshape(
+            (output_size, hidden_struc[len(hidden_struc) - 1])
+        )
         ind_index += hidden_struc[len(hidden_struc) - 1] * output_size
+
+        assert ind_index == len(individual)
 
     @staticmethod
     @abc.abstractmethod
