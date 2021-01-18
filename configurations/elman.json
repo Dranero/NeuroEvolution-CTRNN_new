@@ -1,24 +1,20 @@
 {
   "environment": "LunarLander-v2",
   "random_seed": 0,
-  "number_generations": 150,
+  "number_generations": 200,
   "optimizer": {
-    "type": "MU_ES",
-    "hof_size": 10,
-    "checkpoint_frequency": 10,
-    "initial_gene_range": 2,
-    "tournsize": 3,
-    "mu": 30,
-    "extra_from_hof": 0,
-    "lambda_": 600,
-    "mutpb": 0.8,
+    "type": "CMA_ES",
+    "population_size": 100,
+    "sigma": 1.0,
+    "checkpoint_frequency": 0,
+    "hof_size": 5,
+    "mu": 25,
     "efficiency_weight": 0.0,
-    "fix_seed_for_generation": true,
-    "strategy_parameter_per_gene": false
+    "fix_seed_for_generation": false
   },
   "brain": {
     "type": "ELMAN",
-    "hidden_structure": [7,5],
+    "hidden_structure": [7],
     "diagonal_hidden_to_hidden": true,
     "use_bias": true,
     "normalize_input": false,

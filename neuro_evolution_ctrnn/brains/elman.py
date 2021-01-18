@@ -1,8 +1,10 @@
 import numpy as np
 from gym import Space
-from brains.i_brain import ConfigClass
+from brains.i_brain import ConfigClass, IBrain
 from tools.configurations import ElmanCfg
 from brains.i_layer_based_brain import ILayerBasedBrain
+import torch
+import torch.nn as nn
 
 
 class ElmanNetwork(ILayerBasedBrain[ElmanCfg]):
@@ -68,3 +70,22 @@ class ElmanNetwork(ILayerBasedBrain[ElmanCfg]):
             np.zeros((len(self.weight_ho), len(self.get_brain_nodes()) - len(self.weight_ho[0]))),
             self.weight_ho
         )
+
+
+class ElmanPytorch(IBrain):
+    def __init__(self, input_space: Space, output_space: Space, individual: np.ndarray, config: ConfigClass):
+        with torch.no_grad():
+            #only one layer
+            self.elman = nn.RNN(
+                IBrain._size_from_space(input_space), IBrain._size_from_space(output_space),
+                1, bias=config.use_bias)
+
+    def brainstep(self, ob: np.ndarray):
+        with torch.no_grad():
+            # Input requires the form (seq_len, batch, input_size)
+            out, self.hidden = self.elman(torch.from_numpy(ob.astype(np.float32)).view(1, 1, -1), self.hidden)
+            return out.view(IBrain._size_from_space(self.output_space)).numpy()
+
+    @classmethod
+    def get_individual_size(cls, config: ConfigClass, input_space: Space, output_space: Space):
+        pass
