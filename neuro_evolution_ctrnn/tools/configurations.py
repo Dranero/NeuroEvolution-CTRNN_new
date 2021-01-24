@@ -1,8 +1,7 @@
 # the configurations need to be in a separate file from the actual objects to avoid circular imports
 import attr
 import abc
-from typing import Dict, List, Optional, Type
-import array
+from typing import Dict, List, Optional
 
 registered_types: Dict = {}
 registered_keys: Dict = {}
@@ -47,10 +46,12 @@ class IBrainCfg(abc.ABC):
 
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class ILayerBasedBrainCfg(IBrainCfg):
-    # List of the Gru layers.
-    # [5] is one layer with 5 gru nodes, [2,8] is first one layer with 2 nodes and then one layer with 8 nodes
+    # The structure of the layers
+    # Each list entry translates to the size of one layer
+    # The layers are in the given order
     hidden_structure: List[int]
     optimize_initial_hidden_values: bool
+    # Whether a neuron can only use its own state form the last timestep
     diagonal_hidden_to_hidden: bool = True
 
 

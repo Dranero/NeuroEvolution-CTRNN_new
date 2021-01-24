@@ -10,18 +10,14 @@ class GruNetwork(ILayerBasedBrain[GruCfg]):
         super().__init__(input_space, output_space, individual, config)
 
     @staticmethod
-    def sigmoid(x):
-        return 1 / (1 + np.exp(-x))
-
-    @staticmethod
     def layer_step(layer_input, weight_ih, weight_hh, bias_h, hidden):
         # Reset Gate
-        r_t = GruNetwork.sigmoid(np.dot(weight_ih[0], layer_input)
+        r_t = ILayerBasedBrain.sigmoid(np.dot(weight_ih[0], layer_input)
                                  + np.dot(weight_hh[0], hidden)
                                  + bias_h[0])
 
         # Update Gate
-        z_t = GruNetwork.sigmoid(np.dot(weight_ih[1], layer_input)
+        z_t = ILayerBasedBrain.sigmoid(np.dot(weight_ih[1], layer_input)
                                  + np.dot(weight_hh[1], hidden)
                                  + bias_h[1])
 

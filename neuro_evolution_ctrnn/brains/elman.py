@@ -28,6 +28,8 @@ class ElmanNetwork(ILayerBasedBrain[ElmanCfg]):
         return np.array([item for sublist in self.hidden for item in sublist])
 
     def get_brain_edge_weights(self):
+        # A complete matrix for the weighted input values
+        # Is used to draw the lines in the visualization
         result: np.array = self.weight_hh[0][0]
         for i in range(1, len(self.hidden)):
             result = self.append_matrix_horizontally(result, self.append_matrix_vertically(
@@ -41,21 +43,10 @@ class ElmanNetwork(ILayerBasedBrain[ElmanCfg]):
 
     @staticmethod
     def append_matrix_vertically(matrix1, matrix2):
-        if np.array(matrix1).size == 0:
-            return matrix2
-        if np.array(matrix2).size == 0:
-            return matrix1
-        assert (len(matrix1) == len(matrix2))
         return np.concatenate((matrix1, matrix2), 1)
 
     @staticmethod
     def append_matrix_horizontally(matrix1, matrix2):
-        if np.array(matrix1).size == 0:
-            return matrix2
-        if np.array(matrix2).size == 0:
-            return matrix1
-        # TODO mehr überprüfen ob alles gültige Matrizen sind
-        assert (len(matrix1[0]) == len(matrix2[0]))
         return np.concatenate((matrix1, matrix2), 0)
 
     def get_input_matrix(self):
@@ -72,10 +63,13 @@ class ElmanNetwork(ILayerBasedBrain[ElmanCfg]):
         )
 
 
-class ElmanPytorch(IBrain):
+class ElmanPytorch(nn.Module, IBrain):
     def __init__(self, input_space: Space, output_space: Space, individual: np.ndarray, config: ConfigClass):
+        nn.Module.__init__(self)
+        IBrain.__init__(self, input_space, output_space, individual, config)
+        self.output_size = IBrain._size_from_space(self.output_space)
         with torch.no_grad():
-            #only one layer
+            # only one layer
             self.elman = nn.RNN(
                 IBrain._size_from_space(input_space), IBrain._size_from_space(output_space),
                 1, bias=config.use_bias)
@@ -84,7 +78,7 @@ class ElmanPytorch(IBrain):
         with torch.no_grad():
             # Input requires the form (seq_len, batch, input_size)
             out, self.hidden = self.elman(torch.from_numpy(ob.astype(np.float32)).view(1, 1, -1), self.hidden)
-            return out.view(IBrain._size_from_space(self.output_space)).numpy()
+            return out.view(self.output_size).numpy()
 
     @classmethod
     def get_individual_size(cls, config: ConfigClass, input_space: Space, output_space: Space):
