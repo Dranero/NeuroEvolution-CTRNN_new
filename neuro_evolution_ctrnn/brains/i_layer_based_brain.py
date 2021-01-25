@@ -178,7 +178,7 @@ class ILayerBasedBrain(IBrain, Generic[LayerdConfigClass]):
                                            self.hidden[layer])
             self.hidden[layer] = layer_result[0]
             self.layer_output[layer] = layer_result[1]
-        return np.dot(self.weight_ho, self.layer_output[len(self.layer_output) - 1])
+        return np.dot(self.weight_ho, self.layer_output[len(self.layer_output) - 1].T)
 
     @staticmethod
     @abc.abstractmethod
