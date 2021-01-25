@@ -64,15 +64,57 @@ class ElmanNetwork(ILayerBasedBrain[ElmanCfg]):
 
 
 class ElmanPytorch(nn.Module, IBrain):
+
     def __init__(self, input_space: Space, output_space: Space, individual: np.ndarray, config: ConfigClass):
         nn.Module.__init__(self)
         IBrain.__init__(self, input_space, output_space, individual, config)
         self.output_size = IBrain._size_from_space(self.output_space)
+        self.hidden = (
+            torch.zeros(config.num_layers, 1, config.hidden_size)
+        )
+
         with torch.no_grad():
-            # only one layer
             self.elman = nn.RNN(
-                IBrain._size_from_space(input_space), IBrain._size_from_space(output_space),
-                1, bias=config.use_bias)
+                input_size=IBrain._size_from_space(input_space), hidden_size=config.hidden_size,
+                num_layers=config.num_layers, bias=config.use_bias)
+        current_index = 0
+        for i in range(config.num_layers):
+            attr_weight_ih_li = "weight_ih_l{}".format(i)
+            attr_weight_hh_li = "weight_hh_l{}".format(i)
+
+            weight_ih_li = getattr(self.elman, attr_weight_ih_li)
+            weight_hh_li = getattr(self.elman, attr_weight_hh_li)
+
+            weight_ih_li_size = np.prod(weight_ih_li.size())
+            weight_hh_li_size = np.prod(weight_hh_li.size())
+
+            weight_ih_li.data = torch.from_numpy(np.asarray(
+                individual[current_index: current_index + weight_ih_li_size])).view(weight_ih_li.size()).float()
+            current_index += weight_ih_li_size
+
+            weight_hh_li.data = torch.from_numpy(np.asarray(
+                individual[current_index: current_index + weight_hh_li_size])).view(weight_hh_li.size()).float()
+            current_index += weight_hh_li_size
+
+            if config.use_bias:
+                attr_bias_ih_li = "bias_ih_l{}".format(i)
+                attr_bias_hh_li = "bias_hh_l{}".format(i)
+
+                bias_ih_li = getattr(self.elman, attr_bias_ih_li)
+                bias_hh_li = getattr(self.elman, attr_bias_hh_li)
+
+                bias_ih_li_size = bias_ih_li.size()[0]
+                bias_hh_li_size = bias_hh_li.size()[0]
+
+                bias_ih_li.data = torch.from_numpy(
+                    np.asarray(individual[current_index: current_index + bias_ih_li_size])).float()
+                current_index += bias_ih_li_size
+
+                bias_hh_li.data = torch.from_numpy(
+                    np.asarray(individual[current_index: current_index + bias_hh_li_size])).float()
+                current_index += bias_hh_li_size
+
+        assert current_index == len(individual)
 
     def brainstep(self, ob: np.ndarray):
         with torch.no_grad():
@@ -82,4 +124,24 @@ class ElmanPytorch(nn.Module, IBrain):
 
     @classmethod
     def get_individual_size(cls, config: ConfigClass, input_space: Space, output_space: Space):
-        pass
+        index = 0
+        # size of the learnable input-hidden weights
+        index += config.hidden_size * IBrain._size_from_space(input_space) * config.num_layers
+        # size of the learnable hidden-hidden weights
+        index += config.hidden_size * config.hidden_size * config.num_layers
+
+        if config.use_bias:
+            index += 2 * config.hidden_size * config.num_layers
+        return index
+
+    def get_brain_nodes(self):
+        raise NotImplementedError
+
+    def get_brain_edge_weights(self):
+        raise NotImplementedError
+
+    def get_input_matrix(self):
+        raise NotImplementedError
+
+    def get_output_matrix(self):
+        raise NotImplementedError

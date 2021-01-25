@@ -182,6 +182,13 @@ class LSTMCfg(IBrainCfg):
     lstm_num_layers: int
 
 
+@register('ElmanTorch')
+@attr.s(slots=True, auto_attribs=True, frozen=True)
+class ElmanTorchCfg(IBrainCfg):
+    num_layers: int
+    hidden_size: int
+
+
 @register('ConcatenatedBrain_LSTM')
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class ConcatenatedBrainLSTMCfg(IBrainCfg):
