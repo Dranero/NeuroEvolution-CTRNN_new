@@ -24,7 +24,7 @@ from processing_handlers.sequential_handler import SequentialHandler
 from tools.env_handler import EnvHandler
 from brains.CNN_CTRNN import CnnCtrnn
 from brains.elman import ElmanNetwork, ElmanPytorch
-from brains.gru import GruNetwork
+from brains.gru import GruNetwork, GruPyTorch
 
 
 class Experiment(object):
@@ -52,6 +52,8 @@ class Experiment(object):
             self.brain_class = ElmanNetwork
         elif self.config.brain.type == "ElmanTorch":
             self.brain_class = ElmanPytorch
+        elif self.config.brain.type == "GruTorch":
+            self.brain_class = GruPyTorch
         elif self.config.brain.type == "GRU":
             self.brain_class = GruNetwork
         elif self.config.brain.type == "ConcatenatedBrain_LSTM":

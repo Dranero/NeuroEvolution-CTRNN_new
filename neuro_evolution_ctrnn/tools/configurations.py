@@ -45,6 +45,12 @@ class IBrainCfg(abc.ABC):
 
 
 @attr.s(slots=True, auto_attribs=True, frozen=True)
+class IPytorchBrainCfg(IBrainCfg):
+    num_layers: int
+    hidden_size: int
+
+
+@attr.s(slots=True, auto_attribs=True, frozen=True)
 class ILayerBasedBrainCfg(IBrainCfg):
     # The structure of the layers
     # Each list entry translates to the size of one layer
@@ -174,7 +180,6 @@ class FeedForwardCfg(IBrainCfg):
     cppn_hidden_layers: List[int]
 
 
-@register('LSTM_PyTorch')
 @register('LSTM_NumPy')
 @register('LSTMNumPy')
 @attr.s(slots=True, auto_attribs=True, frozen=True)
@@ -184,9 +189,20 @@ class LSTMCfg(IBrainCfg):
 
 @register('ElmanTorch')
 @attr.s(slots=True, auto_attribs=True, frozen=True)
-class ElmanTorchCfg(IBrainCfg):
-    num_layers: int
-    hidden_size: int
+class ElmanTorchCfg(IPytorchBrainCfg):
+    pass
+
+@register('GruTorch')
+@attr.s(slots=True, auto_attribs=True, frozen=True)
+class GruTorchCfg(IPytorchBrainCfg):
+    pass
+
+
+
+@register('LSTM_PyTorch')
+@attr.s(slots=True, auto_attribs=True, frozen=True)
+class LstmTorchCfg(IPytorchBrainCfg):
+    pass
 
 
 @register('ConcatenatedBrain_LSTM')

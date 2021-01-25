@@ -14,8 +14,8 @@
   },
   "brain": {
     "type": "ElmanTorch",
-    "hidden_size": 4,
-    "num_layers": 1,
+    "hidden_size": 5,
+    "num_layers": 2,
     "use_bias": true,
     "normalize_input": false,
     "normalize_input_target": 3

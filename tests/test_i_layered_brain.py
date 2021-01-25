@@ -92,7 +92,6 @@ class TestILayeredBrain:
                               config=layer_config)
         ob = np.array([1, 1])
         assert np.allclose(brain.hidden, np.zeros([2, 2]))
-        print("!!!!!!!!!!!!!!!!!HALLLO!!!!!!!!!!!!!!!")
         res = brain.step(ob)
         # due to identity matrices after one iteration the internal state is now exactly the observersion
         assert np.allclose(brain.hidden, ob)
