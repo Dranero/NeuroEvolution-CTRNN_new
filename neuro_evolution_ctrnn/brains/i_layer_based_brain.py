@@ -32,27 +32,22 @@ class ILayerBasedBrain(IBrain, Generic[LayerdConfigClass]):
         for layer in range(len(hidden_structure)):
 
             # Matrices for weighted input values in calculations
-
-            if layer == 0:  # The first Layer don't has an output from the previous layer, but the input values
+            if layer == 0:
+                number_elements = number_gates * hidden_structure[0] * input_size
                 self.weight_ih.append(
                     np.array(
-                        individual[
-                            individual_index:
-                            individual_index + number_gates * hidden_structure[layer] * input_size
-                        ]
-                    ).reshape((number_gates, hidden_structure[layer], input_size))
+                        individual[individual_index: individual_index + number_elements]
+                    ).reshape((number_gates, hidden_structure[0], input_size))
                 )
-                individual_index += number_gates * input_size * hidden_structure[0]
+                individual_index += number_elements
             else:
+                number_elements = number_gates * hidden_structure[layer] * hidden_structure[layer - 1]
                 self.weight_ih.append(
                     np.array(
-                        individual[
-                            individual_index:
-                            individual_index + number_gates * hidden_structure[layer] * hidden_structure[layer - 1]
-                        ]
+                        individual[individual_index: individual_index + number_elements]
                     ).reshape((number_gates, hidden_structure[layer], hidden_structure[layer - 1]))
                 )
-                individual_index += number_gates * hidden_structure[layer - 1] * hidden_structure[layer]
+                individual_index += number_elements
 
             # Matrices for weighted state values in calculations
             if config.diagonal_hidden_to_hidden:  # Whether each neuron can only access its own state
@@ -66,54 +61,47 @@ class ILayerBasedBrain(IBrain, Generic[LayerdConfigClass]):
                 )
                 individual_index += number_gates * hidden_structure[layer]
             else:
+                number_elements = number_gates * hidden_structure[layer] * hidden_structure[layer]
                 self.weight_hh.append(
                     np.array(
-                        individual[
-                            individual_index:
-                            individual_index + number_gates * hidden_structure[layer] * hidden_structure[layer]
-                        ]
+                        individual[individual_index: individual_index + number_elements]
                     ).reshape((number_gates, hidden_structure[layer], hidden_structure[layer]))
                 )
-                individual_index += number_gates * hidden_structure[layer] * hidden_structure[layer]
+                individual_index += number_elements
 
             # initialize biases
 
             # Biases for gates
             if config.use_bias:
+                number_elements = hidden_structure[layer] * number_gates
                 self.bias_h.append(
                     np.array(
-                        individual[
-                            individual_index:
-                            individual_index + hidden_structure[layer] * number_gates
-                        ]
+                        individual[individual_index: individual_index + number_elements]
                     ).reshape((number_gates, hidden_structure[layer]))
                 )
-                individual_index += hidden_structure[layer] * number_gates
+                individual_index += number_elements
             else:
                 self.bias_h.append(np.zeros((number_gates, hidden_structure[layer])).astype(np.float32))
 
             # initialize initial state values
-            if config.optimize_initial_hidden_values:
+
+            if config.optimize_initial_neuron_state:
+                number_elements = hidden_structure[layer]
                 self.hidden.append(np.array(
-                    individual[
-                        individual_index:
-                        individual_index + hidden_structure[layer]
-                    ]
+                    individual[individual_index: individual_index + number_elements]
                 ))
-                individual_index += hidden_structure[layer]
+                individual_index += number_elements
             else:
                 self.hidden.append(np.zeros((hidden_structure[layer])))
             self.layer_output.append(np.zeros((hidden_structure[layer])))
         # for end
 
         # Matrix for transforming output of last layer into output neurons
+        number_elements = hidden_structure[len(hidden_structure) - 1] * output_size
         self.weight_ho = np.array(
-            individual[
-                individual_index:
-                individual_index + hidden_structure[len(hidden_structure) - 1] * output_size
-            ]
+            individual[individual_index: individual_index + number_elements]
         ).reshape((output_size, hidden_structure[len(hidden_structure) - 1]))
-        individual_index += hidden_structure[len(hidden_structure) - 1] * output_size
+        individual_index += number_elements
 
         # Has all values been used and therefore does get_individual_size() provide the right number?
         assert individual_index == len(individual)
@@ -153,7 +141,7 @@ class ILayerBasedBrain(IBrain, Generic[LayerdConfigClass]):
                 individual_size += hidden_struc[layer] * number_gates
 
             # Hidden values
-            if config.optimize_initial_hidden_values:
+            if config.optimize_initial_neuron_state:
                 individual_size += hidden_struc[layer]
         # for end
 

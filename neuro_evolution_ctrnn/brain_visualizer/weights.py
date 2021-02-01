@@ -1,6 +1,6 @@
 import math
 from typing import Tuple
-
+import logging
 import pygame
 import numpy as np
 
@@ -113,10 +113,12 @@ class Weights:
 
             max_end_neuron = np.argmax(np.abs(start_neuron_weights))
             weight = start_neuron_weights[max_end_neuron]
-            # print(max_end_neuron)
-            # print(start_neuron_weights)
-            # print("----")
-            # print(end_pos_dict)
+
+            logging.debug(max_end_neuron)
+            logging.debug(start_neuron_weights)
+            logging.debug("----")
+            logging.debug(end_pos_dict)
+
             start_pos = start_pos_dict[start_neuron]
             end_pos = end_pos_dict[max_end_neuron]
 

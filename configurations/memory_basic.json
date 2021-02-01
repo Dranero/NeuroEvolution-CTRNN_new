@@ -19,7 +19,7 @@
     "use_bias": true,
     "normalize_input": false,
     "normalize_input_target": 3,
-    "optimize_initial_hidden_values": false
+    "optimize_initial_neuron_state": false
   },
   "episode_runner": {
     "number_fitness_runs": 50,

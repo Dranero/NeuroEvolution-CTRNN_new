@@ -19,18 +19,6 @@ class BrainParam:
 
 class LayerTestCase(ILayerBasedBrain[ILayerBasedBrainCfg]):
 
-    def get_brain_nodes(self):
-        raise NotImplementedError
-
-    def get_brain_edge_weights(self):
-        raise NotImplementedError
-
-    def get_input_matrix(self):
-        raise NotImplementedError
-
-    def get_output_matrix(self):
-        raise NotImplementedError
-
     def __init__(self, input_space: Space, output_space: Space, individual: np.ndarray, config: LayerdConfigClass):
         super().__init__(input_space, output_space, individual, config)
 

@@ -27,15 +27,5 @@
     "max_steps_penalty": 0,
     "reuse_env": true,
     "use_autoencoder": false
-  },
-  "novelty": {
-    "behavioral_interval": 10,
-    "behavioral_max_length": 100,
-    "behavior_source": "action",
-    "distance": "euclid",
-    "max_recorded_behaviors": 30,
-    "recorded_behaviors_per_generation": 5,
-    "novelty_nearest_k": 5,
-    "novelty_weight": 0.5
   }
 }

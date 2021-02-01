@@ -25,10 +25,10 @@ class ElmanNetwork(ILayerBasedBrain[ElmanCfg]):
     def __init__(self, input_space: Space, output_space: Space, individual: np.ndarray, config: ConfigClass):
         super().__init__(input_space, output_space, individual, config)
 
-    def get_brain_nodes(self):
+    def get_neuron_states(self):
         return np.array([item for sublist in self.hidden for item in sublist])
 
-    def get_brain_edge_weights(self):
+    def get_internal_weight_matrix(self):
         # A complete matrix for the weighted input values
         # Is used to draw the lines in the visualization
         result: np.array = self.weight_hh[0][0]
@@ -50,16 +50,16 @@ class ElmanNetwork(ILayerBasedBrain[ElmanCfg]):
     def append_matrix_horizontally(matrix1, matrix2):
         return np.concatenate((matrix1, matrix2), 0)
 
-    def get_input_matrix(self):
+    def get_input_weight_matrix(self):
         # TODO visualize bias
         return self.append_matrix_horizontally(
             self.weight_ih[0][0],
-            np.zeros((len(self.get_brain_nodes()) - len(self.weight_ih[0][0]), len(self.weight_ih[0][0][0])))
+            np.zeros((len(self.get_neuron_states()) - len(self.weight_ih[0][0]), len(self.weight_ih[0][0][0])))
         )
 
-    def get_output_matrix(self):
+    def get_output_weight_matrix(self):
         return self.append_matrix_vertically(
-            np.zeros((len(self.weight_ho), len(self.get_brain_nodes()) - len(self.weight_ho[0]))),
+            np.zeros((len(self.weight_ho), len(self.get_neuron_states()) - len(self.weight_ho[0]))),
             self.weight_ho
         )
 

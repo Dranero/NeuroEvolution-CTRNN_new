@@ -1,16 +1,13 @@
 import abc
-from abc import ABC
-
 import torch
 from gym import Space
 from torch import nn
 import numpy as np
-
 from brains.i_brain import IBrain, ConfigClass
 from tools.configurations import IPytorchBrainCfg
 
 
-class IPytorchBrain(nn.Module, IBrain, ABC):
+class IPytorchBrain(nn.Module, IBrain, abc.ABC):
 
     def __init__(self, input_space: Space, output_space: Space, individual: np.ndarray, config: IPytorchBrainCfg):
         nn.Module.__init__(self)
@@ -21,8 +18,6 @@ class IPytorchBrain(nn.Module, IBrain, ABC):
 
         if config.num_layers <= 0:
             raise RuntimeError("PyTorch need at least one layer.")
-
-        individual = np.array(individual, dtype=np.float32)
 
         # Disable tracking of the gradients since backpropagation is not used
         with torch.no_grad():
@@ -114,15 +109,3 @@ class IPytorchBrain(nn.Module, IBrain, ABC):
             # Input requires the form (seq_len, batch, input_size)
             out, self.hidden = self.brain(torch.from_numpy(ob.astype(np.float32)).view(1, 1, -1), self.hidden)
             return np.dot(self.weight_ho, out.flatten())
-
-    def get_brain_nodes(self):
-        raise NotImplementedError
-
-    def get_brain_edge_weights(self):
-        raise NotImplementedError
-
-    def get_input_matrix(self):
-        raise NotImplementedError
-
-    def get_output_matrix(self):
-        raise NotImplementedError

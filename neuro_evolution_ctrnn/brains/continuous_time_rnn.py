@@ -32,7 +32,7 @@ class ContinuousTimeRNN(IBrain[ContinuousTimeRNNCfg]):
     def __init__(self, input_space: Space, output_space: Space, individual: np.ndarray, config: ContinuousTimeRNNCfg):
         super().__init__(input_space, output_space, individual, config)
         assert len(individual) == self.get_individual_size(config, input_space, output_space)
-        optimize_y0 = config.optimize_y0
+        optimize_y0 = config.optimize_initial_neuron_state
         delta_t = config.delta_t
         self.config = config
         self.input_space: Space = input_space
@@ -141,7 +141,7 @@ class ContinuousTimeRNN(IBrain[ContinuousTimeRNNCfg]):
     @classmethod
     def get_individual_size(cls, config: ContinuousTimeRNNCfg, input_space: Space, output_space: Space):
         individual_size = np.count_nonzero(cls.v_mask) + np.count_nonzero(cls.w_mask) + np.count_nonzero(cls.t_mask)
-        if config.optimize_y0:
+        if config.optimize_initial_neuron_state:
             individual_size += config.number_neurons
 
         if config.optimize_state_boundaries == "legacy":
@@ -210,14 +210,14 @@ class ContinuousTimeRNN(IBrain[ContinuousTimeRNNCfg]):
         else:
             raise RuntimeError("unknown mask_type: " + str(mask_type))
 
-    def get_brain_nodes(self):
+    def get_neuron_states(self):
         return self.y
 
-    def get_brain_edge_weights(self):
+    def get_internal_weight_matrix(self):
         return self.W.todense()
 
-    def get_input_matrix(self):
+    def get_input_weight_matrix(self):
         return self.V.toarray()
 
-    def get_output_matrix(self):
+    def get_output_weight_matrix(self):
         return self.T.toarray()

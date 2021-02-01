@@ -56,7 +56,7 @@ class ILayerBasedBrainCfg(IBrainCfg):
     # Each list entry translates to the size of one layer
     # The layers are in the given order
     hidden_structure: List[int]
-    optimize_initial_hidden_values: bool
+    optimize_initial_neuron_state: bool
     # Whether a neuron can only use its own state form the last timestep
     diagonal_hidden_to_hidden: bool = True
 
@@ -130,7 +130,7 @@ class GruCfg(ILayerBasedBrainCfg):
 @register('CTRNN')
 @attr.s(slots=True, auto_attribs=True, frozen=True)
 class ContinuousTimeRNNCfg(IBrainCfg):
-    optimize_y0: bool
+    optimize_initial_neuron_state: bool
     delta_t: float
     optimize_state_boundaries: str
     set_principle_diagonal_elements_of_W_negative: bool

@@ -105,18 +105,14 @@ class IBrain(abc.ABC, Generic[ConfigClass]):
         ob_new[ob] = 1
         return ob_new
 
-    @abc.abstractmethod
-    def get_brain_nodes(self):
-        pass
+    def get_neuron_states(self):
+        raise NotImplementedError("Support for brain visualizer is not implemented for this brain.")
 
-    @abc.abstractmethod
-    def get_brain_edge_weights(self):
-        pass
+    def get_internal_weight_matrix(self):
+        raise NotImplementedError("Support for brain visualizer is not implemented for this brain.")
 
-    @abc.abstractmethod
-    def get_input_matrix(self):
-        pass
+    def get_input_weight_matrix(self):
+        raise NotImplementedError("Support for brain visualizer is not implemented for this brain.")
 
-    @abc.abstractmethod
-    def get_output_matrix(self):
-        pass
+    def get_output_weight_matrix(self):
+        raise NotImplementedError("Support for brain visualizer is not implemented for this brain.")

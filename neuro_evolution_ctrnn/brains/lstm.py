@@ -243,15 +243,3 @@ class LSTMLayered(ILayerBasedBrain[LstmLayeredCfg]):
         cell_state = np.multiply(f_t, hidden) + np.multiply(i_t, g_t)
         output = np.multiply(o_t, np.tanh(cell_state))
         return [cell_state, output]
-
-    def get_brain_nodes(self):
-        raise NotImplementedError
-
-    def get_brain_edge_weights(self):
-        raise NotImplementedError
-
-    def get_input_matrix(self):
-        raise NotImplementedError
-
-    def get_output_matrix(self):
-        raise NotImplementedError
