@@ -18,7 +18,7 @@
   },
   "brain": {
     "type": "GRU",
-    "hidden_structure": [4,4],
+    "hidden_layer_structure": [4,4],
     "diagonal_hidden_to_hidden": true,
     "use_bias": true,
     "normalize_input": false,

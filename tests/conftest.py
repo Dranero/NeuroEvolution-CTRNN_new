@@ -47,7 +47,7 @@ def lstm_config() -> LSTMCfg:
 @pytest.fixture
 def layer_config() -> ILayerBasedBrainCfg:
     return ILayerBasedBrainCfg(type=None, normalize_input=False, normalize_input_target=1, use_bias=True,
-                               hidden_structure=[2], diagonal_hidden_to_hidden=False,
+                               hidden_layer_structure=[2], diagonal_hidden_to_hidden=False,
                                optimize_initial_hidden_values=True, )
 
 
